@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>VV Animator — [TITLE]</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .canvas {
+    width: 405px;
+    height: 720px;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+  }
+  svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+
+  /* Text overlays — condition lines */
+  .txt {
+    position: absolute;
+    left: 116px;
+    top: 192px;
+    color: white;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    opacity: 0;
+    white-space: nowrap;
+  }
+
+  /* Action labels — centered below each shape */
+  .action-lbl {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    opacity: 0;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <svg viewBox="0 0 405 720">
+    <defs>
+      <!-- Glow filter — apply to ball when it goes solid and lands -->
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!--
+      ── BALL (protagonist) ─────────────────────────────────────────────
+      Starts as a tiny dot. Grows, travels, morphs between hollow and solid.
+      cx/cy/r are animated via gsap attr:{}.
+      fill and stroke are animated as direct GSAP properties (not attr).
+    -->
+    <circle id="ball"
+      cx="203" cy="300" r="1"
+      fill="transparent"
+      stroke="white"
+      stroke-width="2"
+    />
+
+    <!--
+      ── SHAPES ─────────────────────────────────────────────────────────
+      Add shapes here. All start hidden (opacity="0") or undrawn (dashoffset set).
+      See references/_core.md for SVG snippets and sizing conventions.
+
+      BOOK example:
+      <g id="book"> ... </g>
+
+      RECTANGLE example:
+      <rect id="rect-outline" x="163" y="305" width="80" height="185"
+        fill="none" stroke="white" stroke-width="2" opacity="0" rx="0" ry="0"/>
+
+      TRIANGLE example:
+      <polygon id="triangle" points="203,338 133,455 273,455"
+        fill="white" opacity="0"/>
+    -->
+
+  </svg>
+
+  <!--
+    ── TEXT OVERLAYS ─────────────────────────────────────────────────
+    Add one div per condition line. All start opacity:0.
+    Position: left:116px top:192px (matches original VV style).
+  -->
+  <!-- <div id="t1" class="txt">if you [condition]</div> -->
+  <!-- <div id="t2" class="txt">if you [condition]</div> -->
+
+  <!--
+    ── ACTION LABELS ─────────────────────────────────────────────────
+    Centered below the shape. Adjust top: to sit ~20px below shape bottom.
+  -->
+  <!-- <div id="lbl-action" class="action-lbl" style="top: 556px;">[action]</div> -->
+
+</div>
+
+<script>
+/*
+  ── RESET HELPERS ────────────────────────────────────────────────────
+  Add a reset function for any elements that use stroke-dashoffset draw-on.
+  Call at the top of play() before rebuilding the timeline.
+
+  function resetDrawOn() {
+    const dashIds = ['b-base', 'lp1', 'lp2', 'lp3', 'sp1', 'sp2', 'sp3', 'rp1', 'rp2', 'rp3'];
+    dashIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.setAttribute('stroke-dashoffset', el.getAttribute('stroke-dasharray'));
+    });
+  }
+*/
+
+function play() {
+
+  // ── RESET ──────────────────────────────────────────────────────────
+  // gsap.set(['#t1', '#t2', '#lbl-action'], { opacity: 0 });
+  // gsap.set('#rect-outline', { opacity: 0, attr: { rx: 0, ry: 0 } });
+  // gsap.set('#triangle', { opacity: 0 });
+  gsap.set('#ball', {
+    attr: { cx: 203, cy: 300, r: 1 },
+    fill: 'transparent', stroke: 'white', filter: 'none', opacity: 1
+  });
+  // resetDrawOn();
+
+  const tl = gsap.timeline({ onComplete: () => setTimeout(play, 2500) });
+
+  // ── SCENE A ────────────────────────────────────────────────────────
+  // tl.to('#t1', { opacity: 1, duration: 0.5 })
+  //   .to('#ball', { attr: { r: 26, cy: 295 }, duration: 0.7, ease: 'power2.out' }, 0)
+  //   ...
+
+  // ── SCENE B ────────────────────────────────────────────────────────
+  // ...
+
+}
+
+play();
+</script>
+</body>
+</html>

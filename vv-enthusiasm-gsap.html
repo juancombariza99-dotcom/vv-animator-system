@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Enduring Enthusiasm — GSAP</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .canvas {
+    width: 405px;
+    height: 720px;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+  }
+  svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  .txt {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 168px;
+    color: white;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 15px;
+    letter-spacing: 0.01em;
+    opacity: 0;
+    white-space: nowrap;
+    text-align: center;
+  }
+  .txt2 {
+    top: 190px;
+  }
+  .txt3 {
+    top: 212px;
+  }
+  .action-lbl {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    opacity: 0;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <svg viewBox="0 0 405 720">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+      <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="white"/>
+      </marker>
+    </defs>
+
+    <!-- BALL -->
+    <circle id="ball" cx="203" cy="300" r="1" fill="transparent" stroke="white" stroke-width="2"/>
+
+    <!-- SCENE A: Ascending staircase bars -->
+    <g id="bars-group">
+      <line id="bar1" x1="130" y1="560" x2="130" y2="530" stroke="white" stroke-width="3.5" opacity="0"/>
+      <line id="bar2" x1="150" y1="560" x2="150" y2="518" stroke="white" stroke-width="3.5" opacity="0"/>
+      <line id="bar3" x1="170" y1="560" x2="170" y2="504" stroke="white" stroke-width="3.5" opacity="0"/>
+      <line id="bar4" x1="190" y1="560" x2="190" y2="488" stroke="white" stroke-width="3.5" opacity="0"/>
+      <line id="bar5" x1="210" y1="560" x2="210" y2="470" stroke="white" stroke-width="3.5" opacity="0"/>
+      <line id="bar6" x1="230" y1="560" x2="230" y2="448" stroke="white" stroke-width="3.5" opacity="0"/>
+      <line id="bar7" x1="250" y1="560" x2="250" y2="424" stroke="white" stroke-width="3.5" opacity="0"/>
+      <line id="bar8" x1="270" y1="560" x2="270" y2="396" stroke="white" stroke-width="3.5" opacity="0"/>
+    </g>
+
+    <!-- SCENE B: Scatter dots for frontier -->
+    <g id="scatter-group" opacity="0">
+      <!-- Dense left cluster -->
+      <circle cx="72" cy="400" r="3" fill="white" opacity="0.5"/>
+      <circle cx="85" cy="385" r="3" fill="white" opacity="0.45"/>
+      <circle cx="65" cy="420" r="3" fill="white" opacity="0.5"/>
+      <circle cx="90" cy="430" r="3" fill="white" opacity="0.4"/>
+      <circle cx="78" cy="445" r="3" fill="white" opacity="0.5"/>
+      <circle cx="100" cy="395" r="3" fill="white" opacity="0.45"/>
+      <circle cx="95" cy="415" r="3" fill="white" opacity="0.4"/>
+      <circle cx="108" cy="440" r="3" fill="white" opacity="0.35"/>
+      <circle cx="60" cy="435" r="3" fill="white" opacity="0.45"/>
+      <circle cx="80" cy="460" r="3" fill="white" opacity="0.4"/>
+      <circle cx="110" cy="405" r="3" fill="white" opacity="0.35"/>
+      <circle cx="70" cy="370" r="3" fill="white" opacity="0.4"/>
+      <circle cx="55" cy="410" r="3" fill="white" opacity="0.45"/>
+      <circle cx="105" cy="455" r="3" fill="white" opacity="0.35"/>
+      <circle cx="88" cy="370" r="3" fill="white" opacity="0.4"/>
+      <circle cx="75" cy="475" r="3" fill="white" opacity="0.35"/>
+      <circle cx="98" cy="465" r="3" fill="white" opacity="0.3"/>
+      <circle cx="62" cy="455" r="3" fill="white" opacity="0.4"/>
+      <!-- Mid-sparse -->
+      <circle cx="130" cy="410" r="3" fill="white" opacity="0.3"/>
+      <circle cx="140" cy="440" r="3" fill="white" opacity="0.25"/>
+      <circle cx="150" cy="395" r="3" fill="white" opacity="0.25"/>
+      <circle cx="160" cy="425" r="3" fill="white" opacity="0.2"/>
+      <circle cx="145" cy="460" r="3" fill="white" opacity="0.2"/>
+      <!-- Sparse -->
+      <circle cx="190" cy="420" r="3" fill="white" opacity="0.15"/>
+      <circle cx="210" cy="445" r="3" fill="white" opacity="0.12"/>
+      <circle cx="225" cy="400" r="3" fill="white" opacity="0.1"/>
+      <!-- Very sparse -->
+      <circle cx="270" cy="430" r="3" fill="white" opacity="0.08"/>
+    </g>
+
+    <!-- SCENE C: 5 rectangles (3 solid, 2 dashed gaps) -->
+    <rect id="rect1" x="42" y="420" width="44" height="65" fill="white" rx="2" opacity="0"/>
+    <rect id="rect2-gap" x="112" y="420" width="44" height="65" fill="none" stroke="white" stroke-width="1.2" stroke-dasharray="5 4" rx="2" opacity="0"/>
+    <rect id="rect3" x="182" y="420" width="44" height="65" fill="white" rx="2" opacity="0"/>
+    <rect id="rect4-gap" x="252" y="420" width="44" height="65" fill="none" stroke="white" stroke-width="1.2" stroke-dasharray="5 4" rx="2" opacity="0"/>
+    <rect id="rect5" x="322" y="420" width="44" height="65" fill="white" rx="2" opacity="0"/>
+
+    <!-- SCENE D: Filled gap rects -->
+    <rect id="rect2-fill" x="112" y="420" width="44" height="65" fill="white" rx="2" opacity="0"/>
+    <rect id="rect4-fill" x="252" y="420" width="44" height="65" fill="white" rx="2" opacity="0"/>
+
+    <!-- SCENE E: X mark + Fan arrows -->
+    <g id="x-mark" opacity="0">
+      <line x1="196" y1="304" x2="210" y2="318" stroke="white" stroke-width="1.5"/>
+      <line x1="210" y1="304" x2="196" y2="318" stroke="white" stroke-width="1.5"/>
+    </g>
+
+    <path id="fan1" d="M 203,324 Q 120,440 68,570" fill="none" stroke="white" stroke-width="1.3" marker-end="url(#arrow)" opacity="0"/>
+    <path id="fan2" d="M 203,324 Q 160,440 140,570" fill="none" stroke="white" stroke-width="1.3" marker-end="url(#arrow)" opacity="0"/>
+    <path id="fan3" d="M 203,324 Q 246,440 266,570" fill="none" stroke="white" stroke-width="1.3" marker-end="url(#arrow)" opacity="0"/>
+    <path id="fan4" d="M 203,324 Q 286,440 338,570" fill="none" stroke="white" stroke-width="1.3" marker-end="url(#arrow)" opacity="0"/>
+  </svg>
+
+  <!-- TEXT LINES -->
+  <div id="t1a" class="txt">enduring enthusiasm</div>
+  <div id="t1b" class="txt txt2">is the only way to put in</div>
+  <div id="t1c" class="txt txt3">a thousand reps.</div>
+
+  <div id="t2a" class="txt">a thousand reps</div>
+  <div id="t2b" class="txt txt2">puts you at the frontier.</div>
+
+  <div id="t3a" class="txt">at the frontier</div>
+  <div id="t3b" class="txt txt2">you see visible gaps.</div>
+
+  <div id="t4a" class="txt">solving those gaps</div>
+  <div id="t4b" class="txt txt2">turns into 'products'.</div>
+
+  <div id="t5a" class="txt">a software. a service.</div>
+  <div id="t5b" class="txt txt2">information. or an investment.</div>
+
+  <!-- ACTION LABELS -->
+  <div id="lbl-reps" class="action-lbl" style="top: 574px;">1,000 REPS</div>
+  <div id="lbl-frontier" class="action-lbl" style="top: 470px;">FRONTIER</div>
+  <div id="lbl-gaps" class="action-lbl" style="top: 500px;">VISIBLE GAPS</div>
+  <div id="lbl-products" class="action-lbl" style="top: 500px;">'PRODUCTS'</div>
+
+  <!-- FAN LABELS -->
+  <div id="lbl-sw" class="action-lbl" style="top: 588px; left: 68px; transform: translateX(-50%);">SOFTWARE</div>
+  <div id="lbl-sv" class="action-lbl" style="top: 588px; left: 140px; transform: translateX(-50%);">SERVICE</div>
+  <div id="lbl-in" class="action-lbl" style="top: 588px; left: 266px; transform: translateX(-50%);">INFORMATION</div>
+  <div id="lbl-iv" class="action-lbl" style="top: 588px; left: 338px; transform: translateX(-50%);">INVESTMENT</div>
+
+</div>
+
+<script>
+// Setup fan arrow dash lengths
+['fan1','fan2','fan3','fan4'].forEach(id => {
+  const el = document.getElementById(id);
+  const len = Math.ceil(el.getTotalLength());
+  el.setAttribute('stroke-dasharray', len);
+  el.setAttribute('stroke-dashoffset', len);
+});
+
+const ALL_TEXT = ['#t1a','#t1b','#t1c','#t2a','#t2b','#t3a','#t3b','#t4a','#t4b','#t5a','#t5b'];
+const ALL_LBLS = ['#lbl-reps','#lbl-frontier','#lbl-gaps','#lbl-products','#lbl-sw','#lbl-sv','#lbl-in','#lbl-iv'];
+const BARS = ['#bar1','#bar2','#bar3','#bar4','#bar5','#bar6','#bar7','#bar8'];
+const RECTS = ['#rect1','#rect2-gap','#rect3','#rect4-gap','#rect5'];
+const FANS = ['#fan1','#fan2','#fan3','#fan4'];
+
+function resetFans() {
+  FANS.forEach(id => {
+    const el = document.querySelector(id);
+    const len = el.getAttribute('stroke-dasharray');
+    el.setAttribute('stroke-dashoffset', len);
+  });
+}
+
+function play() {
+  // ── RESET ──
+  gsap.set(ALL_TEXT, { opacity: 0 });
+  gsap.set(ALL_LBLS, { opacity: 0 });
+  gsap.set(BARS, { opacity: 0, scaleY: 0, transformOrigin: '50% 100%' });
+  gsap.set('#bars-group', { opacity: 1 });
+  gsap.set('#scatter-group', { opacity: 0 });
+  gsap.set(RECTS, { opacity: 0 });
+  gsap.set('#rect2-fill', { opacity: 0, filter: 'none' });
+  gsap.set('#rect4-fill', { opacity: 0, filter: 'none' });
+  gsap.set('#x-mark', { opacity: 0, filter: 'none' });
+  gsap.set(FANS, { opacity: 0 });
+  resetFans();
+  gsap.set('#ball', {
+    attr: { cx: 203, cy: 300, r: 1 },
+    fill: 'transparent', stroke: 'white', filter: 'none', opacity: 1
+  });
+
+  const tl = gsap.timeline({ onComplete: () => setTimeout(play, 3000) });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SCENE A: "enduring enthusiasm... a thousand reps" (0–3.9s)
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Text fades in
+  tl.to('#t1a', { opacity: 1, duration: 0.5 })
+    .to('#t1b', { opacity: 1, duration: 0.4 }, '-=0.2')
+    .to('#t1c', { opacity: 1, duration: 0.4 }, '-=0.2')
+
+  // Ball grows from dot to hollow ring
+    .to('#ball', { attr: { r: 20, cy: 310 }, duration: 0.7, ease: 'power2.out' }, 0.1)
+
+  // Bars grow staggered (the reps accumulating)
+    .to(BARS, {
+      opacity: 1, scaleY: 1,
+      duration: 0.3, stagger: 0.22, ease: 'power3.out'
+    }, 0.8)
+
+  // Ball travels upward alongside bars as they grow
+    .to('#ball', {
+      attr: { cx: 270, cy: 380, r: 16 },
+      fill: 'white', stroke: 'rgba(255,255,255,0)',
+      filter: 'url(#glow)',
+      duration: 1.4, ease: 'power2.inOut'
+    }, 1.5)
+
+  // Label
+    .to('#lbl-reps', { opacity: 1, duration: 0.35 }, 3.2)
+
+  // Hold
+    .to({}, { duration: 0.5 })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SCENE B: "a thousand reps puts you at the frontier" (4.4–6.3s)
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Fade out Scene A text + bars
+    .to(['#t1a','#t1b','#t1c','#lbl-reps'], { opacity: 0, duration: 0.3 })
+    .to('#bars-group', { opacity: 0, duration: 0.4 }, '<')
+
+  // New text fades in
+    .to('#t2a', { opacity: 1, duration: 0.45 }, '-=0.1')
+    .to('#t2b', { opacity: 1, duration: 0.4 }, '-=0.15')
+
+  // Scatter dots fade in
+    .to('#scatter-group', { opacity: 1, duration: 0.8, ease: 'power1.inOut' }, '-=0.3')
+
+  // Ball moves to frontier position (far right, alone)
+    .to('#ball', {
+      attr: { cx: 320, cy: 420, r: 18 },
+      duration: 0.7, ease: 'power2.inOut'
+    }, '-=0.6')
+
+  // Frontier label
+    .to('#lbl-frontier', { opacity: 1, duration: 0.35 })
+
+  // Hold
+    .to({}, { duration: 0.7 })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SCENE C: "at the frontier you see visible gaps" (6.8–9.1s)
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Fade out Scene B
+    .to(['#t2a','#t2b','#lbl-frontier'], { opacity: 0, duration: 0.3 })
+    .to('#scatter-group', { opacity: 0, duration: 0.35 }, '<')
+
+  // Ball moves to center-top
+    .to('#ball', {
+      attr: { cx: 203, cy: 310, r: 20 },
+      fill: 'transparent', stroke: 'white',
+      filter: 'none',
+      duration: 0.5, ease: 'power2.inOut'
+    }, '-=0.2')
+
+  // New text
+    .to('#t3a', { opacity: 1, duration: 0.45 }, '-=0.1')
+    .to('#t3b', { opacity: 1, duration: 0.4 }, '-=0.15')
+
+  // Solid rects appear
+    .to('#rect1', { opacity: 0.7, duration: 0.3, ease: 'power2.out' }, '-=0.2')
+    .to('#rect3', { opacity: 0.7, duration: 0.3, ease: 'power2.out' }, '-=0.15')
+    .to('#rect5', { opacity: 0.7, duration: 0.3, ease: 'power2.out' }, '-=0.15')
+
+  // Gap rects draw in (dashed outlines)
+    .to('#rect2-gap', { opacity: 0.5, duration: 0.4, ease: 'power2.out' }, '-=0.1')
+    .to('#rect4-gap', { opacity: 0.5, duration: 0.4, ease: 'power2.out' }, '-=0.2')
+
+  // Pulse: ball and gaps pulse together
+    .to('#ball', { attr: { r: 23 }, filter: 'url(#glow)', duration: 0.35, ease: 'power2.out' })
+    .to(['#rect2-gap','#rect4-gap'], { opacity: 0.9, duration: 0.35, ease: 'power2.out' }, '<')
+    .to('#ball', { attr: { r: 20 }, filter: 'none', duration: 0.35, ease: 'power2.in' })
+    .to(['#rect2-gap','#rect4-gap'], { opacity: 0.5, duration: 0.35, ease: 'power2.in' }, '<')
+
+  // Gaps label
+    .to('#lbl-gaps', { opacity: 1, duration: 0.35 }, '-=0.2')
+
+  // Hold
+    .to({}, { duration: 0.4 })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SCENE D: "solving those gaps turns into 'products'" (9.6–11.7s)
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Fade old text, bring new
+    .to(['#t3a','#t3b','#lbl-gaps'], { opacity: 0, duration: 0.3 })
+    .to('#t4a', { opacity: 1, duration: 0.45 }, '-=0.1')
+    .to('#t4b', { opacity: 1, duration: 0.4 }, '-=0.15')
+
+  // Gaps fill solid (solving them)
+    .to('#rect2-fill', { opacity: 0.9, filter: 'url(#glow)', duration: 0.5, ease: 'power2.out' }, '-=0.1')
+    .to('#rect4-fill', { opacity: 0.9, filter: 'url(#glow)', duration: 0.5, ease: 'power2.out' }, '-=0.3')
+
+  // Ball goes solid + glow
+    .to('#ball', {
+      fill: 'white', stroke: 'rgba(255,255,255,0)',
+      filter: 'url(#glow)',
+      duration: 0.4, ease: 'power2.out'
+    }, '-=0.3')
+
+  // Dim original solid rects slightly
+    .to(['#rect1','#rect3','#rect5'], { opacity: 0.5, duration: 0.3 }, '-=0.2')
+
+  // Products label
+    .to('#lbl-products', { opacity: 1, duration: 0.35 })
+
+  // Hold
+    .to({}, { duration: 0.6 })
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SCENE E: "a software. a service. information. or an investment." (12.1–15.3s)
+  // ═══════════════════════════════════════════════════════════════════
+
+  // Fade out Scene D elements
+    .to(['#t4a','#t4b','#lbl-products'], { opacity: 0, duration: 0.3 })
+    .to(RECTS, { opacity: 0, duration: 0.3 }, '<')
+    .to(['#rect2-fill','#rect4-fill'], { opacity: 0, duration: 0.3 }, '<')
+
+  // Ball shrinks and becomes X mark
+    .to('#ball', {
+      attr: { r: 3 },
+      duration: 0.25, ease: 'power2.in'
+    })
+    .to('#ball', { opacity: 0, duration: 0.15 })
+    .to('#x-mark', { opacity: 1, duration: 0.2 })
+
+  // Text: first half
+    .to('#t5a', { opacity: 1, duration: 0.4 }, '-=0.1')
+
+  // Fan arrows draw on staggered — "a software" then "a service"
+    .to('#fan1', { opacity: 1, duration: 0.01 })
+    .to('#fan1', { strokeDashoffset: 0, duration: 0.5, ease: 'power2.out' })
+    .to('#lbl-sw', { opacity: 1, duration: 0.25 }, '-=0.15')
+
+    .to('#fan2', { opacity: 1, duration: 0.01 }, '+=0.15')
+    .to('#fan2', { strokeDashoffset: 0, duration: 0.5, ease: 'power2.out' })
+    .to('#lbl-sv', { opacity: 1, duration: 0.25 }, '-=0.15')
+
+  // Text: second half
+    .to('#t5a', { opacity: 0, duration: 0.2 }, '+=0.2')
+    .to('#t5b', { opacity: 1, duration: 0.4 }, '-=0.1')
+
+  // "information"
+    .to('#fan3', { opacity: 1, duration: 0.01 })
+    .to('#fan3', { strokeDashoffset: 0, duration: 0.5, ease: 'power2.out' })
+    .to('#lbl-in', { opacity: 1, duration: 0.25 }, '-=0.15')
+
+  // "or an investment"
+    .to('#fan4', { opacity: 1, duration: 0.01 }, '+=0.15')
+    .to('#fan4', { strokeDashoffset: 0, duration: 0.5, ease: 'power2.out' })
+    .to('#lbl-iv', { opacity: 1, duration: 0.25 }, '-=0.15')
+
+  // X mark glows at end
+    .to('#x-mark', { filter: 'url(#glow)', duration: 0.4 })
+
+  // Final hold
+    .to({}, { duration: 1.2 });
+}
+
+play();
+</script>
+</body>
+</html>

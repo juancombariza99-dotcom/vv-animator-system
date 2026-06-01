@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ideas — GSAP v3</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+  .canvas {
+    width: 405px;
+    height: 720px;
+    background: #000;
+    position: relative;
+    overflow: hidden;
+  }
+  svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+  }
+  .txt {
+    position: absolute;
+    left: 116px;
+    top: 192px;
+    color: white;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    opacity: 0;
+    white-space: nowrap;
+  }
+  .action-lbl {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 300;
+    font-size: 17px;
+    letter-spacing: 0.01em;
+    opacity: 0;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <svg viewBox="0 0 405 720">
+    <defs>
+      <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="6" result="blur"/>
+        <feMerge>
+          <feMergeNode in="blur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- ── BALL ── -->
+    <circle id="ball"
+      cx="203" cy="250" r="1"
+      fill="transparent"
+      stroke="white"
+      stroke-width="2"
+    />
+
+    <!-- ── BOOK ── baseline at y=535 -->
+    <g id="book">
+      <!-- Baseline draws L→R -->
+      <line id="b-base" x1="82" y1="535" x2="268" y2="535"
+        stroke="white" stroke-width="1.4"
+        stroke-dasharray="190" stroke-dashoffset="190"/>
+
+      <!-- Left pages fan from spine to left -->
+      <path id="lp1" d="M 193,505 Q 165,517 105,535"
+        fill="none" stroke="white" stroke-width="1.2"
+        stroke-dasharray="110" stroke-dashoffset="110"/>
+      <path id="lp2" d="M 193,509 Q 167,520 113,535"
+        fill="none" stroke="white" stroke-width="1.2"
+        stroke-dasharray="110" stroke-dashoffset="110"/>
+      <path id="lp3" d="M 193,514 Q 169,524 124,535"
+        fill="none" stroke="white" stroke-width="1.2"
+        stroke-dasharray="110" stroke-dashoffset="110"/>
+
+      <!-- Spine lines draw downward -->
+      <line id="sp1" x1="193" y1="497" x2="193" y2="535"
+        stroke="white" stroke-width="1.3"
+        stroke-dasharray="40" stroke-dashoffset="40"/>
+      <line id="sp2" x1="195" y1="497" x2="193" y2="535"
+        stroke="white" stroke-width="1.1"
+        stroke-dasharray="40" stroke-dashoffset="40"/>
+      <line id="sp3" x1="198" y1="499" x2="193" y2="535"
+        stroke="white" stroke-width="1.0"
+        stroke-dasharray="38" stroke-dashoffset="38"/>
+
+      <!-- Right pages fan from spine to right -->
+      <path id="rp1" d="M 193,505 Q 218,517 258,535"
+        fill="none" stroke="white" stroke-width="1.2"
+        stroke-dasharray="110" stroke-dashoffset="110"/>
+      <path id="rp2" d="M 193,509 Q 217,520 250,535"
+        fill="none" stroke="white" stroke-width="1.2"
+        stroke-dasharray="110" stroke-dashoffset="110"/>
+      <path id="rp3" d="M 193,514 Q 215,524 240,535"
+        fill="none" stroke="white" stroke-width="1.2"
+        stroke-dasharray="110" stroke-dashoffset="110"/>
+    </g>
+
+    <!-- Mid-turn arc group -->
+    <g id="page-turn" opacity="0">
+      <path d="M 193,505 Q 218,478 242,505"
+        fill="none" stroke="white" stroke-width="1.2"/>
+      <path d="M 193,509 Q 216,484 237,509"
+        fill="none" stroke="white" stroke-width="1.1"/>
+      <path d="M 193,514 Q 214,491 232,514"
+        fill="none" stroke="white" stroke-width="1.0"/>
+    </g>
+
+    <!-- Closed book — single flat line after page turn -->
+    <line id="book-closed"
+      x1="140" y1="535" x2="244" y2="535"
+      stroke="white" stroke-width="1.4" opacity="0"/>
+
+    <!-- Rectangle solid -->
+    <rect id="rect-solid"
+      x="163" y="305" width="80" height="185"
+      fill="white" opacity="0"/>
+
+    <!-- Rectangle outline — morphs to oval via rx/ry -->
+    <rect id="rect-outline"
+      x="163" y="305" width="80" height="185"
+      fill="none" stroke="white" stroke-width="2" opacity="0"
+      rx="0" ry="0"/>
+
+    <!-- Triangle — compact, pointing up -->
+    <polygon id="triangle"
+      points="203,338 133,455 273,455"
+      fill="white" opacity="0"/>
+
+  </svg>
+
+  <!-- Text lines -->
+  <div id="t1" class="txt">if you don't have ideas</div>
+  <div id="t2" class="txt">if you have ideas</div>
+  <div id="t3" class="txt">but can't articulate them</div>
+
+  <!-- Action labels -->
+  <div id="lbl-read"  class="action-lbl" style="top: 556px;">read</div>
+  <div id="lbl-write" class="action-lbl" style="top: 506px;">write</div>
+
+</div>
+
+<script>
+function resetBook() {
+  const dashIds = ['b-base','lp1','lp2','lp3','sp1','sp2','sp3','rp1','rp2','rp3'];
+  dashIds.forEach(id => {
+    const el = document.getElementById(id);
+    el.setAttribute('stroke-dashoffset', el.getAttribute('stroke-dasharray'));
+  });
+  gsap.set('#page-turn',   { opacity: 0 });
+  gsap.set('#book-closed', { opacity: 0 });
+}
+
+function play() {
+
+  // ── RESET ────────────────────────────────────────────────────────────────
+  gsap.set(['#t1','#t2','#t3','#lbl-read','#lbl-write'], { opacity: 0 });
+  gsap.set('#rect-solid',   { opacity: 0 });
+  gsap.set('#rect-outline', { opacity: 0, attr: { rx: 0, ry: 0 } });
+  gsap.set('#triangle',     { opacity: 0 });
+  gsap.set('#ball', {
+    attr: { cx: 203, cy: 250, r: 1 },
+    fill: 'transparent', stroke: 'white', filter: 'none', opacity: 1
+  });
+  resetBook();
+
+  const tl = gsap.timeline({ onComplete: () => setTimeout(play, 2500) });
+
+  // ── SCENE A: "if you don't have ideas" ───────────────────────────────────
+
+  // Text fades in; ball grows from dot → hollow ring while falling
+  tl.to('#t1', { opacity: 1, duration: 0.5 })
+    .to('#ball', { attr: { r: 26, cy: 295 }, duration: 0.7, ease: 'power2.out' }, 0)
+    .to('#ball', { attr: { cy: 490 }, duration: 1.3, ease: 'power1.inOut' }, '+=0.1')
+
+  // Book draws while ball is falling: spine → pages fan → baseline
+    .to(['#sp1','#sp2','#sp3'], {
+      strokeDashoffset: 0, duration: 0.22, stagger: 0.04, ease: 'power2.out'
+    }, '-=1.0')
+    .to(['#lp1','#rp1'], { strokeDashoffset: 0, duration: 0.32, ease: 'power2.out' }, '-=0.78')
+    .to(['#lp2','#rp2'], { strokeDashoffset: 0, duration: 0.32, ease: 'power2.out' }, '-=0.50')
+    .to(['#lp3','#rp3'], { strokeDashoffset: 0, duration: 0.28, ease: 'power2.out' }, '-=0.28')
+    .to('#b-base',       { strokeDashoffset: 0, duration: 0.40, ease: 'power1.inOut' }, '-=0.20')
+
+  // Ball lands on RIGHT side of book, becomes solid + glowing
+    .to('#ball', {
+      attr: { cx: 233, cy: 490, r: 26 },
+      fill: '#ffffff',
+      stroke: 'rgba(255,255,255,0)',
+      filter: 'url(#glow)',
+      duration: 0.40,
+      ease: 'power2.out'
+    }, '-=0.25')
+    .to('#lbl-read', { opacity: 1, duration: 0.35 }, '-=0.05')
+    .to({}, { duration: 0.9 })
+
+  // ── PAGE TURN ─────────────────────────────────────────────────────────────
+
+  // Clear text + label; ball slides LEFT as pages begin to turn
+    .to(['#t1','#lbl-read'], { opacity: 0, duration: 0.3 })
+    .to('#ball', { attr: { cx: 160, cy: 490 }, duration: 0.38, ease: 'power1.inOut' }, '-=0.15')
+
+  // Left pages fold back
+    .to(['#lp3'], { strokeDashoffset: 110, duration: 0.11, ease: 'power1.in' }, '-=0.15')
+    .to(['#lp2'], { strokeDashoffset: 110, duration: 0.11, ease: 'power1.in' }, '-=0.05')
+    .to(['#lp1'], { strokeDashoffset: 110, duration: 0.13, ease: 'power1.in' }, '-=0.05')
+
+  // Mid-turn arc flashes briefly
+    .to('#page-turn', { opacity: 1, duration: 0.07 })
+    .to('#page-turn', { opacity: 0, duration: 0.10 })
+
+  // Right pages + spine close
+    .to(['#rp3','#rp2','#rp1'], { strokeDashoffset: 110, duration: 0.18, stagger: 0.04 }, '-=0.07')
+    .to(['#sp3','#sp2','#sp1'], { strokeDashoffset: 40,  duration: 0.14, stagger: 0.03 }, '-=0.08')
+    .to('#b-base', { strokeDashoffset: 190, duration: 0.18 }, '-=0.08')
+
+  // Book collapses to flat line; ball loses glow and falls
+    .to('#book-closed', { opacity: 1, duration: 0.12 })
+    .to('#ball', {
+      attr: { cx: 203, cy: 555, r: 16 },
+      filter: 'none',
+      duration: 0.45,
+      ease: 'power2.in'
+    }, '-=0.25')
+
+  // ── SCENE B: "if you have ideas" ──────────────────────────────────────────
+
+    .to('#t2', { opacity: 1, duration: 0.4 })
+    .to('#book-closed', { opacity: 0, duration: 0.35 }, '<')
+    .to('#ball', { attr: { r: 13 }, duration: 0.3 }, '<')
+    .to({}, { duration: 0.75 })
+
+  // ── SCENE C: "but can't articulate them" ──────────────────────────────────
+
+    .to('#t2', { opacity: 0, duration: 0.3 })
+    .to('#t3', { opacity: 1, duration: 0.4 }, '-=0.1')
+
+  // Ball moves to below the rect
+    .to('#ball', { attr: { cx: 203, cy: 506 }, duration: 0.4, ease: 'power2.inOut' }, '<')
+
+  // Rect draws in as outline from top
+    .fromTo('#rect-outline',
+      { scaleY: 0, opacity: 0, transformOrigin: '50% 0%' },
+      { scaleY: 1, opacity: 1, duration: 0.45, ease: 'power3.out' }, '-=0.05')
+
+  // Rect FILLS solid — ball exits down-right
+    .to('#rect-solid', { opacity: 1, duration: 0.30 })
+    .to('#ball', { attr: { cx: 250, cy: 635 }, duration: 0.38, ease: 'power2.in' }, '<')
+
+  // Rect solid fades — ball rises to right side of rect (outside)
+    .to('#rect-solid', { opacity: 0, duration: 0.30 })
+    .to('#ball', { attr: { cx: 338, cy: 450 }, duration: 0.38, ease: 'power2.out' }, '<')
+
+    .to({}, { duration: 0.12 })
+
+  // Ball enters rect from right, settles inside near top-left
+    .to('#ball', {
+      attr: { cx: 188, cy: 335, r: 13 },
+      fill: 'white', stroke: 'rgba(255,255,255,0)',
+      duration: 0.55, ease: 'power2.inOut'
+    })
+
+    .to('#lbl-write', { opacity: 1, duration: 0.35 })
+    .to({}, { duration: 0.8 })
+
+  // Rect corners round out → oval
+    .to('#rect-outline', {
+      attr: { rx: 40, ry: 92 },
+      duration: 0.50, ease: 'power2.inOut'
+    })
+
+  // Ball exits below the oval
+    .to('#ball', {
+      attr: { cx: 203, cy: 506 },
+      duration: 0.40, ease: 'power2.in'
+    }, '-=0.3')
+
+    .to({}, { duration: 0.3 })
+
+  // ── SCENE D: triangle ─────────────────────────────────────────────────────
+
+    .to(['#t3','#rect-outline','#lbl-write','#ball'], {
+      opacity: 0, duration: 0.4, stagger: 0.04
+    })
+
+  // Compact triangle scales up from its base
+    .fromTo('#triangle',
+      { scaleY: 0, opacity: 0, transformOrigin: '50% 100%' },
+      { scaleY: 1, opacity: 1, duration: 0.55, ease: 'power3.out' })
+
+  // Ball (hollow ring) pops in at the base
+    .to('#ball', {
+      opacity: 1,
+      attr: { cx: 203, cy: 462, r: 15 },
+      fill: 'transparent', stroke: 'white',
+      duration: 0.32, ease: 'back.out(1.5)'
+    }, '-=0.15')
+
+    .to({}, { duration: 0.5 })
+
+  // "if you have ideas" reappears — ball drifts to the LEFT of triangle
+    .to('#t2', { opacity: 1, duration: 0.4 })
+    .to('#ball', {
+      attr: { cx: 68, cy: 342, r: 19 },
+      duration: 0.9, ease: 'power2.inOut'
+    }, '<')
+
+    .to({}, { duration: 1.2 });
+}
+
+play();
+</script>
+</body>
+</html>

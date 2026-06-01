@@ -1,0 +1,15 @@
+{
+  "name": "vv-animator",
+  "display_name": "VV Animator",
+  "version": "0.1.0",
+  "description": "Create minimal black-and-white GSAP animations in the Visualize Value style. Analyze videos for reference, write and refine scripts, ideate visual concepts, and generate looping HTML animations.",
+  "author": "Juan",
+  "skills": [
+    "skills/analyze-video",
+    "skills/script-audio",
+    "skills/ideate-visuals",
+    "skills/generate-animation"
+  ],
+  "references": "references",
+  "templates": "templates"
+}

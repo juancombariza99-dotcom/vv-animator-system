@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compound Effect — p5.js (hand-drawn)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<script>
+const W = 800, H = 450;
+
+// Scene config
+const AX = 80,  AY = 370;   // axis origin
+const EX = 700, EY = 370;   // axis end X
+const TY = 48;               // top of chart
+
+// Key Y positions
+const startY   = 358;        // where both lines begin
+const flatEndY = 350;        // where the flat line ends
+const curveEndY = 72;        // where the compound curve ends
+
+// Animation phases (in frames at 60fps)
+const PHASES = {
+  grid:         { start: 0,   end: 30  },
+  axes:         { start: 20,  end: 55  },
+  dayLabels:    { start: 50,  end: 75  },
+  dotStart:     { start: 70,  end: 85  },
+  flatLine:     { start: 85,  end: 170 },
+  dotFlatEnd:   { start: 170, end: 185 },
+  lblFlat:      { start: 185, end: 210 },
+  compoundLine: { start: 220, end: 420 },
+  lbl1pct:      { start: 300, end: 330 },
+  dotCurveEnd:  { start: 418, end: 435 },
+  gap:          { start: 450, end: 480 },
+  multiplier:   { start: 478, end: 510 },
+  title:        { start: 525, end: 570 },
+  hold:         { start: 570, end: 730 },
+};
+
+const TOTAL_FRAMES = PHASES.hold.end;
+
+// Noise seed for hand-drawn jitter
+let seed = 0;
+
+new p5(function(p) {
+  let frame = 0;
+  let roughness = 1.2; // line jitter amount
+
+  p.setup = function() {
+    p.createCanvas(W, H);
+    p.frameRate(60);
+    p.textFont('Helvetica Neue, Helvetica, Arial, sans-serif');
+    p.noLoop();
+    renderFrame();
+  };
+
+  function renderFrame() {
+    p.draw();
+    frame++;
+    if (frame <= TOTAL_FRAMES) {
+      requestAnimationFrame(renderFrame);
+    } else {
+      // pause then replay
+      setTimeout(() => {
+        frame = 0;
+        seed = p.random(1000);
+        renderFrame();
+      }, 2800);
+    }
+  }
+
+  p.draw = function() {
+    p.background(0);
+    p.randomSeed(seed);
+
+    const t = frame;
+    const ease = (a, b) => p.constrain(p.map(t, a, b, 0, 1), 0, 1);
+    const easeInOut = (a, b) => {
+      let x = ease(a, b);
+      return x < 0.5 ? 2*x*x : -1+(4-2*x)*x;
+    };
+
+    // Helper: draw a rough line with jitter
+    function roughLine(x1, y1, x2, y2, jitter, steps) {
+      steps = steps || Math.ceil(p.dist(x1, y1, x2, y2) / 4);
+      p.beginShape();
+      p.noFill();
+      for (let i = 0; i <= steps; i++) {
+        const tx = p.lerp(x1, x2, i / steps) + p.random(-jitter, jitter);
+        const ty = p.lerp(y1, y2, i / steps) + p.random(-jitter, jitter);
+        p.curveVertex(tx, ty);
+      }
+      p.endShape();
+    }
+
+    // Helper: alpha fade
+    function alpha(a, b, maxAlpha) {
+      return Math.round(ease(a, b) * maxAlpha);
+    }
+
+    // ── GRID ──────────────────────────────────────────────────────────────────
+    const gridAlpha = alpha(PHASES.grid.start, PHASES.grid.end, 10);
+    if (gridAlpha > 0) {
+      p.stroke(255, 255, 255, gridAlpha);
+      p.strokeWeight(0.5);
+      [130, 210, 290].forEach(y => roughLine(AX, y, EX, y, 0.5, 40));
+      [280, 490].forEach(x => roughLine(x, TY, x, AY, 0.5, 20));
+    }
+
+    // ── AXES ──────────────────────────────────────────────────────────────────
+    const axesAlpha = alpha(PHASES.axes.start, PHASES.axes.end, 46);
+    if (axesAlpha > 0) {
+      p.stroke(255, 255, 255, axesAlpha);
+      p.strokeWeight(1.2);
+      // Y axis
+      roughLine(AX, TY, AX, AY + 4, 0.4, 30);
+      // X axis
+      roughLine(AX - 4, AY, 710, AY, 0.4, 50);
+      // Arrows
+      p.fill(255, 255, 255, axesAlpha);
+      p.noStroke();
+      p.triangle(710, 366, 710, 374, 718, 370);
+      p.triangle(76, 46, 84, 46, 80, 38);
+      // Axis text
+      p.noStroke();
+      p.fill(255, 255, 255, axesAlpha);
+      p.textSize(9);
+      p.textAlign(p.LEFT);
+      p.text('TIME', 726, 374);
+      p.textAlign(p.CENTER);
+      p.text('OUTPUT', AX, 28);
+    }
+
+    // ── DAY LABELS ────────────────────────────────────────────────────────────
+    const dayAlpha = alpha(PHASES.dayLabels.start, PHASES.dayLabels.end, 56);
+    if (dayAlpha > 0) {
+      p.fill(255, 255, 255, dayAlpha);
+      p.noStroke();
+      p.textSize(8.5);
+      p.textAlign(p.CENTER);
+      [[80, 'DAY 1'], [390, 'DAY 180'], [700, 'DAY 365']].forEach(([x, lbl]) => {
+        p.stroke(255, 255, 255, dayAlpha);
+        p.strokeWeight(0.8);
+        roughLine(x, 370, x, 377, 0.3, 3);
+        p.noStroke();
+        p.text(lbl, x, 388);
+      });
+    }
+
+    // ── START DOT ─────────────────────────────────────────────────────────────
+    const dotStartAlpha = alpha(PHASES.dotStart.start, PHASES.dotStart.end, 255);
+    if (dotStartAlpha > 0) {
+      p.fill(255, 255, 255, dotStartAlpha);
+      p.noStroke();
+      p.circle(AX, startY, 8);
+    }
+
+    // ── FLAT LINE ─────────────────────────────────────────────────────────────
+    const flatProgress = easeInOut(PHASES.flatLine.start, PHASES.flatLine.end);
+    if (flatProgress > 0) {
+      p.stroke(255, 255, 255, 56);
+      p.strokeWeight(1.5);
+      p.noFill();
+      const endX = p.lerp(AX, EX, flatProgress);
+      const endY = p.lerp(startY, flatEndY, flatProgress);
+      roughLine(AX, startY, endX, endY, roughness, Math.ceil(flatProgress * 50));
+    }
+
+    // Flat end dot
+    const dotFlatAlpha = alpha(PHASES.dotFlatEnd.start, PHASES.dotFlatEnd.end, 56);
+    if (dotFlatAlpha > 0 && flatProgress >= 1) {
+      p.fill(255, 255, 255, dotFlatAlpha);
+      p.noStroke();
+      p.circle(EX, flatEndY, 6);
+    }
+
+    // NO GROWTH label
+    const flatLblAlpha = alpha(PHASES.lblFlat.start, PHASES.lblFlat.end, 76);
+    if (flatLblAlpha > 0) {
+      p.fill(255, 255, 255, flatLblAlpha);
+      p.noStroke();
+      p.textSize(9);
+      p.textAlign(p.LEFT);
+      p.text('NO GROWTH', 560, 340);
+    }
+
+    // ── COMPOUND CURVE ────────────────────────────────────────────────────────
+    const curveProgress = easeInOut(PHASES.compoundLine.start, PHASES.compoundLine.end);
+    if (curveProgress > 0) {
+      p.stroke(255, 255, 255, 255);
+      p.strokeWeight(2.5);
+      p.noFill();
+
+      // Sample the bezier curve up to curveProgress
+      const steps = Math.max(2, Math.ceil(curveProgress * 80));
+      p.beginShape();
+      for (let i = 0; i <= steps; i++) {
+        const bt = (i / steps) * curveProgress;
+        // Cubic bezier: M 80,358 C 480,356 580,275 700,72
+        const bx = cubicBezier(bt, AX, 480, 580, EX);
+        const by = cubicBezier(bt, startY, 356, 275, curveEndY);
+        const jx = i > 0 && i < steps ? p.random(-roughness, roughness) : 0;
+        const jy = i > 0 && i < steps ? p.random(-roughness, roughness) : 0;
+        p.curveVertex(bx + jx, by + jy);
+      }
+      p.endShape();
+    }
+
+    // +1% DAILY label
+    const lbl1pctAlpha = alpha(PHASES.lbl1pct.start, PHASES.lbl1pct.end, 153);
+    if (lbl1pctAlpha > 0) {
+      p.fill(255, 255, 255, lbl1pctAlpha);
+      p.noStroke();
+      p.textSize(10);
+      p.textAlign(p.LEFT);
+      p.text('+1% DAILY', 498, 224);
+    }
+
+    // Curve end dot
+    const dotCurveAlpha = alpha(PHASES.dotCurveEnd.start, PHASES.dotCurveEnd.end, 255);
+    if (dotCurveAlpha > 0 && curveProgress >= 1) {
+      p.fill(255, 255, 255, 30);
+      p.noStroke();
+      p.circle(EX, curveEndY, 18); // glow ring
+      p.fill(255, 255, 255, dotCurveAlpha);
+      p.circle(EX, curveEndY, 8);
+    }
+
+    // ── GAP INDICATOR ─────────────────────────────────────────────────────────
+    const gapAlpha = alpha(PHASES.gap.start, PHASES.gap.end, 56);
+    if (gapAlpha > 0) {
+      p.stroke(255, 255, 255, gapAlpha);
+      p.strokeWeight(0.8);
+      // Dashed line (manual)
+      for (let y = 78; y < 344; y += 8) {
+        p.line(EX, y + p.random(-0.4, 0.4), EX, Math.min(y + 4, 344) + p.random(-0.4, 0.4));
+      }
+      p.fill(255, 255, 255, gapAlpha * 1.8);
+      p.noStroke();
+      p.triangle(697, 84, 703, 84, 700, 76);
+      p.triangle(697, 338, 703, 338, 700, 346);
+    }
+
+    // ── 37× MULTIPLIER ────────────────────────────────────────────────────────
+    const multAlpha = alpha(PHASES.multiplier.start, PHASES.multiplier.end, 255);
+    if (multAlpha > 0) {
+      // Slight scale-in using transformations
+      const sc = 0.7 + 0.3 * ease(PHASES.multiplier.start, PHASES.multiplier.end);
+      p.push();
+      p.translate(730, 219);
+      p.scale(sc);
+      p.translate(-730, -219);
+      p.fill(255, 255, 255, multAlpha);
+      p.noStroke();
+      p.textSize(30);
+      p.textAlign(p.LEFT);
+      p.textStyle(p.BOLD);
+      p.text('37×', 718, 226);
+      p.textStyle(p.NORMAL);
+      p.fill(255, 255, 255, Math.round(multAlpha * 0.35));
+      p.textSize(8);
+      p.text('DIFFERENCE', 719, 242);
+      p.pop();
+    }
+
+    // ── TITLE ─────────────────────────────────────────────────────────────────
+    const titleAlpha = alpha(PHASES.title.start, PHASES.title.end, 217);
+    if (titleAlpha > 0) {
+      p.fill(255, 255, 255, titleAlpha);
+      p.noStroke();
+      p.textSize(11);
+      p.textAlign(p.CENTER);
+      p.textStyle(p.BOLD);
+      // Add slight letter-spacing by drawing char by char isn't easy in p5
+      // Instead use a wider-spaced font string
+      p.text('COMPOUND EFFECT', 390, 424);
+      p.textStyle(p.NORMAL);
+      p.fill(255, 255, 255, Math.round(titleAlpha * 0.3));
+      p.textSize(8);
+      p.text('1.01\u00B3\u2076\u2075 = 37.78', 390, 440);
+    }
+  };
+
+  // Cubic bezier helper
+  function cubicBezier(t, p0, p1, p2, p3) {
+    const mt = 1 - t;
+    return mt*mt*mt*p0 + 3*mt*mt*t*p1 + 3*mt*t*t*p2 + t*t*t*p3;
+  }
+});
+</script>
+</body>
+</html>
